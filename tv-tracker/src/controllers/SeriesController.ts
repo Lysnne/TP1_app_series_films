@@ -22,9 +22,9 @@ export class SeriesController {
             }
 
             // Récupérer tous les épisodes de toutes les saisons
-            const allEpisodes = serie.seasons.flatMap(season => season.episodes);
+            const allEpisodes = serie.saisons.flatMap(season => season.episodes);
             
-            logger.info(`Récupération de ${allEpisodes.length} épisodes pour la série: ${serie.title}`);
+            logger.info(`Récupération de ${allEpisodes.length} épisodes pour la série: ${serie.titre}`);
             res.json(allEpisodes);
         } catch (error) {
             logger.error(`Erreur lors de la récupération des épisodes de la série ${req.params.id}: ${error}`);
@@ -54,13 +54,13 @@ export class SeriesController {
             );
 
             // Créer la nouvelle saison
-            const newSeason = new Season(seasonNumber, new Date(releaseDate), seasonEpisodes);
+            const newSeason = new Season(seasonNumber, seasonEpisodes);
             
             // Ajouter la saison à la série
-            serie.addSeason(newSeason);
+            serie.addSaison(newSeason);
             saveDB();
             
-            logger.info(`Saison ${seasonNumber} ajoutée à la série: ${serie.title}`);
+            logger.info(`Saison ${seasonNumber} ajoutée à la série: ${serie.titre}`);
             res.status(201).json(newSeason);
         } catch (error) {
             logger.error(`Erreur lors de l'ajout de saison à la série ${req.params.id}: ${error}`);
@@ -84,10 +84,10 @@ export class SeriesController {
                 return;
             }
 
-            const season = serie.seasons.find(s => s.seasonNumber === Number(seasonNumber));
+            const season = serie.saisons.find(s => s.numero === Number(seasonNumber));
             
             if (!season) {
-                logger.warn(`Saison ${seasonNumber} non trouvée dans la série: ${serie.title}`);
+                logger.warn(`Saison ${seasonNumber} non trouvée dans la série: ${serie.titre}`);
                 res.status(404).json({ error: "Saison non trouvée" });
                 return;
             }
@@ -105,7 +105,7 @@ export class SeriesController {
             season.addEpisode(newEpisode);
             saveDB();
             
-            logger.info(`Épisode ${episodeNumber} ajouté à la saison ${seasonNumber} de la série: ${serie.title}`);
+            logger.info(`Épisode ${episodeNumber} ajouté à la saison ${seasonNumber} de la série: ${serie.titre}`);
             res.status(201).json(newEpisode);
         } catch (error) {
             logger.error(`Erreur lors de l'ajout d'épisode à la série ${req.params.id}: ${error}`);
@@ -124,14 +124,14 @@ export class SeriesController {
             // Parcourir toutes les séries pour trouver l'épisode
             for (const media of medias) {
                 if (media instanceof Serie) {
-                    for (const season of media.seasons) {
+                    for (const season of media.saisons) {
                         const episode = season.episodes.find(ep => ep.id === id);
                         if (episode) {
-                            episode.Watched();
+                            episode.watched = true;
                             found = true;
                             saveDB();
                             
-                            logger.info(`Épisode marqué comme vu: ${episode.title} (ID: ${id})`);
+                            logger.info(`Épisode marqué comme vu: ${episode.titre} (ID: ${id})`);
                             res.json(episode);
                             return;
                         }
@@ -163,8 +163,8 @@ export class SeriesController {
                 return;
             }
 
-            logger.info(`Récupération de ${serie.seasons.length} saisons pour la série: ${serie.title}`);
-            res.json(serie.seasons);
+            logger.info(`Récupération de ${serie.saisons.length} saisons pour la série: ${serie.titre}`);
+            res.json(serie.saisons);
         } catch (error) {
             logger.error(`Erreur lors de la récupération des saisons de la série ${req.params.id}: ${error}`);
             res.status(500).json({ error: "Erreur interne du serveur" });
@@ -185,27 +185,28 @@ export class SeriesController {
                 return;
             }
 
-            const totalEpisodes = serie.seasons.reduce((sum, season) => sum + season.episodes.length, 0);
-            const watchedEpisodes = serie.WatchedCount();
-            const totalSeasons = serie.seasons.length;
+            const totalEpisodes = serie.saisons.reduce((sum, season) => sum + season.episodes.length, 0);
+            const watchedEpisodes = serie.saisons.reduce((sum, season) => sum + season.episodes.filter(ep => ep.watched).length, 0);
+            const totalSeasons = serie.saisons.length;
+            
             
             const stats = {
-                title: serie.title,
-                status: serie.status,
+                title: serie.titre,
+                status: serie.statut,
                 totalSeasons,
                 totalEpisodes,
                 watchedEpisodes,
                 watchedPercentage: totalEpisodes > 0 ? Math.round((watchedEpisodes / totalEpisodes) * 100) : 0,
-                seasons: serie.seasons.map(season => ({
-                    seasonNumber: season.seasonNumber,
+                seasons: serie.saisons.map(season => ({
+                    seasonNumber: season.numero,
                     totalEpisodes: season.episodes.length,
-                    watchedEpisodes: season.getWatchedCount(),
+                    watchedEpisodes: season.episodes.filter(ep => ep.watched).length,
                     watchedPercentage: season.episodes.length > 0 ? 
-                        Math.round((season.getWatchedCount() / season.episodes.length) * 100) : 0
+                        Math.round((season.episodes.filter(ep => ep.watched).length / season.episodes.length) * 100) : 0
                 }))
             };
 
-            logger.info(`Statistiques récupérées pour la série: ${serie.title}`);
+            logger.info(`Statistiques récupérées pour la série: ${serie.titre}`);
             res.json(stats);
         } catch (error) {
             logger.error(`Erreur lors de la récupération des statistiques de la série ${req.params.id}: ${error}`);

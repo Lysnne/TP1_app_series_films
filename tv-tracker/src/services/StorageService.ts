@@ -29,6 +29,21 @@ export class StorageService {
         try {
             const rawData = await fs.readFile(DB_PATH, "utf-8");
             this.data = JSON.parse(rawData);
+
+            // Backfill de 'type' para entradas existentes sin este campo
+            let changed = false;
+            this.data.medias = this.data.medias.map((m: any) => {
+                if (!m || typeof m !== "object") return m;
+                if (!m.type) {
+                    m.type = Array.isArray(m.saisons) || m.statut ? "serie" : "film";
+                    changed = true;
+                }
+                return m;
+            });
+
+            if (changed) {
+                await this.saveData();
+            }
         } catch (error) {
             console.log("Base de données vide, création d'une nouvelle base");
             this.data = { medias: [], users: [] };
@@ -62,9 +77,10 @@ export class StorageService {
     public async updateMedia(id: string, updatedMedia: Partial<Media>): Promise<Media | undefined> {
         const index = this.data.medias.findIndex(media => media.id === id);
         if (index !== -1) {
-            this.data.medias[index] = { ...this.data.medias[index], ...updatedMedia };
+            const current = this.data.medias[index];
+            Object.assign(current, updatedMedia);
             await this.saveData();
-            return this.data.medias[index];
+            return current;
         }
         return undefined;
     }
@@ -97,9 +113,10 @@ export class StorageService {
     public async updateUser(id: string, updatedUser: Partial<User>): Promise<User | undefined> {
         const index = this.data.users.findIndex(user => user.id === id);
         if (index !== -1) {
-            this.data.users[index] = { ...this.data.users[index], ...updatedUser };
+            const current = this.data.users[index];
+            Object.assign(current, updatedUser);
             await this.saveData();
-            return this.data.users[index];
+            return current;
         }
         return undefined;
     }

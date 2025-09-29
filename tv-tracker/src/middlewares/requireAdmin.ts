@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
-    // Debug : afficher tous les headers reçus
+    //  afficher tous les headers reçus
     console.log("Headers reçus:", req.headers);
     
     // Accepter plusieurs formats de headers

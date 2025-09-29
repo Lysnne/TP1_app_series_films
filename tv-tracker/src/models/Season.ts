@@ -1,6 +1,6 @@
 import { Episode } from "./Episode";
 
-export class Saison {
+export class Season {
     numero: number;
     episodes: Episode[];
 

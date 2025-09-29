@@ -7,7 +7,8 @@
       "userId": "admin1",
       "duree": 148,
       "genre": "Sci-Fi",
-      "annee": 2010
+      "annee": 2010,
+      "type": "film"
     },
     {
       "id": "2",
@@ -47,7 +48,8 @@
             }
           ]
         }
-      ]
+      ],
+      "type": "serie"
     },
     {
       "id": "3",
@@ -56,7 +58,8 @@
       "userId": "user1",
       "duree": 136,
       "genre": "Action",
-      "annee": 1999
+      "annee": 1999,
+      "type": "film"
     }
   ],
   "users": [

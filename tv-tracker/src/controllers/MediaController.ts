@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { StorageService } from "../services/StorageService";
 import { Film } from "../models/Film";
 import { Serie } from "../models/Serie";
-import { Saison } from "../models/Season";
+import { Season } from "../models/Season";
 import { Episode } from "../models/Episode";
 import { logOperation, logError } from "../utils/logger";
 
@@ -11,18 +11,25 @@ export class MediaController {
 
     static async getAllMedias(req: Request, res: Response): Promise<void> {
         try {
-            const { type, genre, annee } = req.query;
+            const { type, genre, annee, year } = req.query;
             let medias = await MediaController.storage.listMedias();
 
             // Filtrage
+            const normalize = (v: unknown) => String(v).toLowerCase();
+            const inferType = (m: any): string => {
+                if (m?.type) return normalize(m.type);
+                if (Array.isArray(m?.saisons) || m?.statut) return "serie";
+                return "film";
+            };
             if (type) {
-                medias = medias.filter(m => m.constructor.name.toLowerCase() === String(type).toLowerCase());
+                medias = medias.filter(m => inferType(m) === normalize(type));
             }
             if (genre) {
                 medias = medias.filter(m => (m as any).genre?.toLowerCase() === String(genre).toLowerCase());
             }
-            if (annee) {
-                medias = medias.filter(m => (m as any).annee === Number(annee));
+            const yearFilter = annee ?? year;
+            if (yearFilter) {
+                medias = medias.filter(m => (m as any).annee === Number(yearFilter));
             }
 
             logOperation("GET_MEDIAS", { count: medias.length, filters: req.query });
@@ -60,8 +67,10 @@ export class MediaController {
             let media;
             if (type === "film") {
                 media = new Film(id, titre, plateforme, userId, duree, genre, annee);
+                (media as any).type = "film";
             } else if (type === "serie") {
                 media = new Serie(id, titre, plateforme, userId, statut);
+                (media as any).type = "serie";
             } else {
                 res.status(400).json({ error: "Type de média invalide" });
                 return;
@@ -120,6 +129,7 @@ export class MediaController {
             const id = Date.now().toString();
             
             const film = new Film(id, titre, plateforme, userId, duree, genre, annee);
+            (film as any).type = "film";
             await MediaController.storage.addMedia(film);
             
             logOperation("CREATE_FILM", { id, titre, userId });
@@ -138,6 +148,7 @@ export class MediaController {
             const id = Date.now().toString();
             
             const serie = new Serie(id, titre, plateforme, userId, statut);
+            (serie as any).type = "serie";
             await MediaController.storage.addMedia(serie);
             
             logOperation("CREATE_SERIE", { id, titre, userId });
@@ -177,7 +188,7 @@ export class MediaController {
                 return;
             }
 
-            const saison = new Saison(numero);
+            const saison = new Season(numero);
             media.addSaison(saison);
             await MediaController.storage.updateMedia(serieId, media);
             
@@ -225,7 +236,7 @@ export class MediaController {
             for (const media of medias) {
                 if (media instanceof Serie) {
                     for (const saison of media.saisons) {
-                        const episode = saison.episodes.find(ep => ep.id === id);
+                        const episode = saison.episodes.find((ep: Episode) => ep.id === id);
                         if (episode) {
                             episode.watched = true;
                             await MediaController.storage.updateMedia(media.id, media);
