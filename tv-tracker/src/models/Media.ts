@@ -1,19 +1,16 @@
 
 export abstract class Media {
     id: string;
-    title:string;
-    genre: string;
-    year:number;
-    rating:number;
+    titre: string;
+    plateforme: string;
+    userId: string;
 
-
-    constructor(id: string,title:string, genre: string,year:number ,rating:number){
+    constructor(id: string, titre: string, plateforme: string, userId: string) {
         this.id = id;
-        this.title = title;
-        this.genre = genre;
-        this.year = year;
-        this.rating = rating;
-
+        this.titre = titre;
+        this.plateforme = plateforme;
+        this.userId = userId;
     }
-
+    
+    abstract getSummary(): string;
 }

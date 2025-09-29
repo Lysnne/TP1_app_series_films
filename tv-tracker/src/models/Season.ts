@@ -1,14 +1,20 @@
-import {Episode} from "./Episode";
+import { Episode } from "./Episode";
 
-class Season{
-    seasonNumber: number ;
-    releaseDate:Date;
+export class Saison {
+    numero: number;
     episodes: Episode[];
 
-    constructor(seasonNumber: number, releaseDate:Date, episodes: Episode[]){
-        this.seasonNumber = seasonNumber;
-        this.releaseDate = releaseDate;
+    constructor(numero: number, episodes: Episode[] = []) {
+        this.numero = numero;
         this.episodes = episodes;
     }
 
+    addEpisode(episode: Episode): void {
+        this.episodes.push(episode);
+    }
+
+    getSummary(): string {
+        return `Saison ${this.numero} - ${this.episodes.length} épisodes`;
+    }
 }
+

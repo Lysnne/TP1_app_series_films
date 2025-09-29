@@ -1,0 +1,74 @@
+{
+  "medias": [
+    {
+      "id": "1",
+      "titre": "Inception",
+      "plateforme": "Netflix",
+      "userId": "admin1",
+      "duree": 148,
+      "genre": "Sci-Fi",
+      "annee": 2010
+    },
+    {
+      "id": "2",
+      "titre": "Breaking Bad",
+      "plateforme": "AMC",
+      "userId": "admin1",
+      "statut": "terminee",
+      "saisons": [
+        {
+          "numero": 1,
+          "episodes": [
+            {
+              "id": "ep1",
+              "titre": "Pilot",
+              "numero": 1,
+              "duree": 58,
+              "watched": false
+            },
+            {
+              "id": "ep2",
+              "titre": "Cat's in the Bag",
+              "numero": 2,
+              "duree": 48,
+              "watched": false
+            }
+          ]
+        },
+        {
+          "numero": 2,
+          "episodes": [
+            {
+              "id": "ep3",
+              "titre": "Seven Thirty-Seven",
+              "numero": 1,
+              "duree": 47,
+              "watched": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "titre": "The Matrix",
+      "plateforme": "HBO",
+      "userId": "user1",
+      "duree": 136,
+      "genre": "Action",
+      "annee": 1999
+    }
+  ],
+  "users": [
+    {
+      "id": "admin1",
+      "nom": "Admin User",
+      "role": "admin"
+    },
+    {
+      "id": "user1",
+      "nom": "Regular User",
+      "role": "user"
+    }
+  ]
+}

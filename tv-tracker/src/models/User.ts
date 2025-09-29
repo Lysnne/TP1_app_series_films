@@ -1,19 +1,17 @@
 import { Media } from "./Media";
 
+export class User {
+    id: string;
+    nom: string;
+    role: "admin" | "user";
 
- class User {
-    id: number;
-    email: string;
-    password: string;
-    role : "admin" | "user" ;
-    favorites:Media[];
-
-    constructor( id:number, email:string, password:string, role : "admin" | "user", favorites:Media[]){
+    constructor(id: string, nom: string, role: "admin" | "user" = "user") {
         this.id = id;
-        this.email = email;
-        this.password = password;
-        this.role = role ;
-        this.favorites= favorites;
+        this.nom = nom;
+        this.role = role;
     }
 
+    isAdmin(): boolean {
+        return this.role === "admin";
+    }
 }

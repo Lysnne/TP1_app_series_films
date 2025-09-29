@@ -1,0 +1,587 @@
+{
+	"info": {
+		"_postman_id": "tv-tracker-api-collection",
+		"name": "TV Tracker API - TP1",
+		"description": "Collection complète pour tester l'API TV Tracker selon les spécifications du TP1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Médias",
+			"item": [
+				{
+					"name": "GET - Lister tous les médias",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							]
+						},
+						"description": "Retourne tous les médias (films et séries)"
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Filtrage combiné (type, genre, année)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias?type=serie&genre=drama&annee=2005",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "serie"
+								},
+								{
+									"key": "genre",
+									"value": "drama"
+								},
+								{
+									"key": "annee",
+									"value": "2005"
+								}
+							]
+						},
+						"description": "Filtrage combiné sur type, genre et année"
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Média par ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias",
+								"1"
+							]
+						},
+						"description": "Obtenir un média par son ID"
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Créer un média (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Inception\",\n  \"plateforme\": \"Netflix\",\n  \"userId\": \"admin1\",\n  \"type\": \"film\",\n  \"duree\": 148,\n  \"genre\": \"Sci-Fi\",\n  \"annee\": 2010\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/medias",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							]
+						},
+						"description": "Ajouter un contenu (requiert rôle admin)"
+					},
+					"response": []
+				},
+				{
+					"name": "PUT - Modifier un média (admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Inception - Director's Cut\",\n  \"rating\": 9.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/medias/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias",
+								"1"
+							]
+						},
+						"description": "Modifier un contenu (requiert rôle admin)"
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - Supprimer un média (admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/medias/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias",
+								"1"
+							]
+						},
+						"description": "Supprimer un contenu (requiert rôle admin)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Films",
+			"item": [
+				{
+					"name": "POST - Ajouter un film (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"The Matrix\",\n  \"plateforme\": \"HBO\",\n  \"duree\": 136,\n  \"genre\": \"Action\",\n  \"annee\": 1999\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						},
+						"description": "Ajout d'un film avec tous les champs requis"
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Film avec titre manquant (invalide)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Action\",\n  \"annee\": 2020\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						},
+						"description": "Le champ titre est requis"
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Film avec titre invalide (invalide)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Film@#$%\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Action\",\n  \"annee\": 2020\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						},
+						"description": "Ne respecte pas la regex de validation"
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Film avec année future (invalide)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Future Film\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Sci-Fi\",\n  \"annee\": 2030\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						},
+						"description": "Le champ année ne doit pas être supérieur à l'année actuelle"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Séries",
+			"item": [
+				{
+					"name": "POST - Ajouter une série (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Breaking Bad\",\n  \"plateforme\": \"AMC\",\n  \"statut\": \"terminee\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/series",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series"
+							]
+						},
+						"description": "Ajout d'une série avec champs et regex valides"
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Liste des épisodes d'une série",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/series/2/episodes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series",
+								"2",
+								"episodes"
+							]
+						},
+						"description": "Liste des épisodes d'une série spécifique"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Saisons",
+			"item": [
+				{
+					"name": "POST - Ajouter une saison (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"serieId\": \"2\",\n  \"numero\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/series/seasons",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series",
+								"seasons"
+							]
+						},
+						"description": "Ajout d'une saison liée à une série"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Épisodes",
+			"item": [
+				{
+					"name": "POST - Ajouter un épisode (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"serieId\": \"2\",\n  \"saisonNumero\": 1,\n  \"titre\": \"Pilot\",\n  \"numero\": 1,\n  \"duree\": 58\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/series/episodes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series",
+								"episodes"
+							]
+						},
+						"description": "Ajout d'un épisode à une saison existante"
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH - Marquer épisode comme vu",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/series/episodes/ep1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series",
+								"episodes",
+								"ep1"
+							]
+						},
+						"description": "Mise à jour de l'état watched"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Utilisateurs",
+			"item": [
+				{
+					"name": "GET - Médias d'un utilisateur",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/user1/medias",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"user1",
+								"medias"
+							]
+						},
+						"description": "Liste des contenus d'un utilisateur spécifique"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Logs",
+			"item": [
+				{
+					"name": "GET - Dernière action",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/logs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"logs"
+							]
+						},
+						"description": "Renvoie la dernière action enregistrée"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tests d'authentification",
+			"item": [
+				{
+					"name": "POST - Sans header x-user-id (401)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Test Film\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Action\",\n  \"annee\": 2020\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						},
+						"description": "Test sans authentification - doit retourner 401"
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Utilisateur non-admin (403)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "user1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Test Film\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Action\",\n  \"annee\": 2020\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						},
+						"description": "Test avec utilisateur non-admin - doit retourner 403"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
