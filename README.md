@@ -8,11 +8,9 @@ Application de suivi de séries et films développée avec TypeScript, Node.js e
 # Installation des dépendances
 npm install
 
-# Démarrage en mode développement
+# Démarrage 
 npm run dev
 
-# Démarrage en mode production
-npm run start
 ```
 
 
