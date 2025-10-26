@@ -1,0 +1,266 @@
+{
+  "info": {
+    "_postman_id": "d8a3b2b5-3c03-4e6b-8e1f-2f22c9b1e2a1",
+    "name": "TV Tracker API v2 (TP2)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection Postman pour tester l'API v2 (TP2): JWT, rôles, pagination, MongoDB."
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "movieId", "value": "" },
+    { "key": "seriesId", "value": "" },
+    { "key": "seasonId", "value": "" },
+    { "key": "episodeId", "value": "" },
+    { "key": "userId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /api/v2/auth/register",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/auth/register", "host": ["{{baseUrl}}"], "path": ["api","v2","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"username\": \"user1\",\n  \"password\": \"Str0ngP@ssw0rd!\",\n  \"role\": \"user\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/v2/auth/login",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/auth/login", "host": ["{{baseUrl}}"], "path": ["api","v2","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Str0ngP@ssw0rd!\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /api/v2/users/me",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/users/me", "host": ["{{baseUrl}}"], "path": ["api","v2","users","me"] }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/v2/users/me",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/users/me", "host": ["{{baseUrl}}"], "path": ["api","v2","users","me"] },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"newname\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v2/users/:id (admin)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api","v2","users","{{userId}}"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Movies",
+      "item": [
+        {
+          "name": "GET /api/v2/movies (filters+pagination)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/movies?title=incep&genre=Sci-Fi&minYear=2000&maxDur=180&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","v2","movies"],
+              "query": [
+                {"key":"title","value":"incep"},
+                {"key":"genre","value":"Sci-Fi"},
+                {"key":"minYear","value":"2000"},
+                {"key":"maxDur","value":"180"},
+                {"key":"page","value":"1"},
+                {"key":"limit","value":"10"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/v2/movies (admin)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/movies", "host": ["{{baseUrl}}"], "path": ["api","v2","movies"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Inception\",\n  \"genres\": [\"Sci-Fi\"],\n  \"durationMin\": 148,\n  \"releaseDate\": \"2010-07-16\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v2/movies/:id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v2/movies/{{movieId}}", "host": ["{{baseUrl}}"], "path": ["api","v2","movies","{{movieId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/v2/movies/:id (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/movies/{{movieId}}", "host": ["{{baseUrl}}"], "path": ["api","v2","movies","{{movieId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"durationMin\": 150\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/v2/movies/:id (admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/movies/{{movieId}}", "host": ["{{baseUrl}}"], "path": ["api","v2","movies","{{movieId}}"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Series / Seasons / Episodes",
+      "item": [
+        {
+          "name": "GET /api/v2/series (filters)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/series?title=bad&genre=Drama&status=ongoing",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","v2","series"],
+              "query": [
+                {"key":"title","value":"bad"},
+                {"key":"genre","value":"Drama"},
+                {"key":"status","value":"ongoing"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/v2/series (admin)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/series", "host": ["{{baseUrl}}"], "path": ["api","v2","series"] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Breaking Bad\",\n  \"genres\": [\"Drama\"],\n  \"status\": \"ongoing\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/v2/series/:seriesId/seasons (admin)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/series/{{seriesId}}/seasons", "host": ["{{baseUrl}}"], "path": ["api","v2","series","{{seriesId}}","seasons"] },
+            "body": { "mode": "raw", "raw": "{\n  \"seasonNo\": 1\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/v2/series/:seriesId/seasons/:seasonId/episodes (admin)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/series/{{seriesId}}/seasons/{{seasonId}}/episodes", "host": ["{{baseUrl}}"], "path": ["api","v2","series","{{seriesId}}","seasons","{{seasonId}}","episodes"] },
+            "body": { "mode": "raw", "raw": "{\n  \"epNo\": 1,\n  \"title\": \"Pilot\",\n  \"durationMin\": 58\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v2/series/:seriesId/seasons/:seasonId/episodes?minDuration=",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/series/{{seriesId}}/seasons/{{seasonId}}/episodes?minDuration=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","v2","series","{{seriesId}}","seasons","{{seasonId}}","episodes"],
+              "query": [ {"key":"minDuration","value":"30"} ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ratings",
+      "item": [
+        {
+          "name": "POST /api/v2/ratings",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/v2/ratings", "host": ["{{baseUrl}}"], "path": ["api","v2","ratings"] },
+            "body": { "mode": "raw", "raw": "{\n  \"target\": \"movie\",\n  \"targetId\": \"{{movieId}}\",\n  \"score\": 9,\n  \"review\": \"Excellent\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v2/ratings/avg/movie/:movieId",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v2/ratings/avg/movie/{{movieId}}", "host": ["{{baseUrl}}"], "path": ["api","v2","ratings","avg","movie","{{movieId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v2/ratings/avg/series/:seriesId",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v2/ratings/avg/series/{{seriesId}}", "host": ["{{baseUrl}}"], "path": ["api","v2","ratings","avg","series","{{seriesId}}"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Recommendations (bonus)",
+      "item": [
+        {
+          "name": "GET /api/v2/reco/movies/by-genre",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v2/reco/movies/by-genre?genre=Sci-Fi&limit=5", "host": ["{{baseUrl}}"], "path": ["api","v2","reco","movies","by-genre"], "query": [ {"key":"genre","value":"Sci-Fi"}, {"key":"limit","value":"5"} ] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v2/reco/series/trending",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v2/reco/series/trending?limit=5", "host": ["{{baseUrl}}"], "path": ["api","v2","reco","series","trending"], "query": [ {"key":"limit","value":"5"} ] }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

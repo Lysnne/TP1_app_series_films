@@ -1,0 +1,7 @@
+{
+  "db": { "uri": "mongodb://localhost:27017/media_dev" },
+  "security": {
+    "jwt": { "secret": "dev-secret", "expiresIn": "1h" },
+    "cors": { "origins": ["http://localhost:3000", "http://localhost:4200"] }
+  }
+}

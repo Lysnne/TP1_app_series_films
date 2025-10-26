@@ -1,0 +1,8 @@
+{
+  "server": { "http": { "port": 3100 } },
+  "db": { "uri": "mongodb://localhost:27017/media_test" },
+  "security": {
+    "jwt": { "secret": "test-secret", "expiresIn": "1h" },
+    "rateLimit": { "windowMs": 60000, "max": 20 }
+  }
+}

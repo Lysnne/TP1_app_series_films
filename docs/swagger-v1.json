@@ -1,0 +1,7 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "TV Tracker API v1", "version": "1.0.0", "description": "Deprecated. Read-only minimal endpoints." },
+  "servers": [{ "url": "/api/v1" }],
+  "paths": {},
+  "components": {}
+}

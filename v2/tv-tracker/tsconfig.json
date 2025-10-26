@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                 // Version JS cible
+    "module": "commonjs",               // Node.js utilise CommonJS
+    "strict": true,                     // Toutes les vérifications strictes
+    "esModuleInterop": true,            // Pour importer des modules CommonJS
+    "resolveJsonModule": true,          // Permet d'importer les fichiers JSON
+    "skipLibCheck": true,               // Ignore les types des dépendances
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "sourceMap": true                    // Pour le debug
+  },
+  "include": ["./**/*.ts"],              // Tous les fichiers TS du projet
+  "exclude": ["tv-tracker/node_modules"]            // Exclure node_modules
+}

@@ -1,0 +1,9 @@
+{
+  "server": {
+    "http": { "enabled": true, "port": 3000 },
+    "https": { "enabled": true, "port": 3443, "redirectAllHttpToHttps": true }
+  },
+  "security": {
+    "cors": { "origins": [] }
+  }
+}
