@@ -6,7 +6,7 @@
     "description": "API v2 avec JWT, rôles (user/admin) et MongoDB. "
   },
   "servers": [
-    { "url": "/api/v2" }
+    { "url": "/docs/v2" }
   ],
   "paths": {
     "/auth/register": {
@@ -72,7 +72,7 @@
         }
       }
     },
-
+ 
     "/movies": {
       "get": {
         "summary": "Lister les films (pagination et filtres)",
@@ -153,7 +153,7 @@
         }
       }
     },
-
+ 
     "/series": {
       "get": {
         "summary": "Lister les séries",
@@ -227,7 +227,7 @@
         }
       }
     },
-
+ 
     "/ratings": {
       "post": {
         "summary": "Créer une note (JWT)",
@@ -278,7 +278,7 @@
         }
       }
     },
-
+ 
     "/users/{id}/medias": {
       "parameters": [ { "$ref": "#/components/parameters/UserIdParam" } ],
       "get": {
@@ -305,7 +305,7 @@
     },
     "schemas": {
       "ObjectId": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" },
-
+ 
       "ErrorResponse": {
         "type": "object",
         "properties": {
@@ -314,7 +314,7 @@
           "details": { "type": "string" }
         }
       },
-
+ 
       "TokenResponse": {
         "type": "object",
         "properties": { "token": { "type": "string" } },
@@ -350,7 +350,7 @@
         },
         "required": ["email", "password"]
       },
-
+ 
       "Movie": {
         "type": "object",
         "properties": {
@@ -386,7 +386,7 @@
           "items": { "type": "array", "items": { "$ref": "#/components/schemas/Movie" } }
         }
       },
-
+ 
       "Series": {
         "type": "object",
         "properties": {
@@ -425,7 +425,7 @@
         "required": ["seasonNo"]
       },
       "SeasonIdParam": { "$ref": "#/components/parameters/SeasonIdParam" },
-
+ 
       "Episode": {
         "type": "object",
         "properties": {
@@ -449,7 +449,7 @@
         },
         "required": ["epNo", "title", "durationMin"]
       },
-
+ 
       "Rating": {
         "type": "object",
         "properties": {
@@ -474,7 +474,7 @@
         },
         "required": ["target", "targetId", "score"]
       },
-
+ 
       "RatingAverage": {
         "type": "object",
         "properties": {
