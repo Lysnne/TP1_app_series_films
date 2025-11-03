@@ -1,5 +1,5 @@
 {
-  "db": { "uri": "mongodb://localhost:27017/media_dev" },
+  "db": { "uri": "mongodb+srv://yislaine:i49CjjumE2GuCO9D@cluster0.exmbru8.mongodb.net/media_dev?retryWrites=true&w=majority&appName=Cluster0" },
   "security": {
     "jwt": { "secret": "dev-secret", "expiresIn": "1h" },
     "cors": { "origins": ["http://localhost:3000", "http://localhost:4200"] }
