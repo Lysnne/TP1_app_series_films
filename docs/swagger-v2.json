@@ -1,16 +1,505 @@
 {
   "openapi": "3.0.3",
-  "info": { "title": "TV Tracker API v2", "version": "2.0.0", "description": "Professional version with JWT, roles, MongoDB." },
-  "servers": [{ "url": "/api/v2" }],
-  "paths": {},
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+  "info": {
+    "title": "TV Tracker API v2",
+    "version": "2.0.0",
+    "description": "API v2 avec JWT, rôles (user/admin) et MongoDB. "
+  },
+  "servers": [
+    { "url": "/api/v2" }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Inscription utilisateur",
+        "description": "Crée un utilisateur et retourne un JWT.",
+        "tags": ["auth"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthRegisterRequest" },
+              "examples": {
+                "default": {
+                  "value": { "email": "jane.doe@example.com", "username": "jane", "password": "Secret123!", "role": "user" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Créé",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthRegisterResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "422": { "$ref": "#/components/responses/Unprocessable" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Connexion utilisateur",
+        "tags": ["auth"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthLoginRequest" },
+              "examples": {
+                "default": {
+                  "value": { "email": "jane.doe@example.com", "password": "Secret123!" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TokenResponse" } } }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+
+    "/movies": {
+      "get": {
+        "summary": "Lister les films (pagination et filtres)",
+        "tags": ["movies"],
+        "security": [],
+        "parameters": [
+          { "name": "title", "in": "query", "schema": { "type": "string", "minLength": 1, "maxLength": 200 } },
+          { "name": "genre", "in": "query", "schema": { "type": "string" } },
+          { "name": "minYear", "in": "query", "schema": { "type": "integer", "minimum": 1800, "maximum": 3000 } },
+          { "name": "maxDur", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 600 } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "minimum": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 }, "description": "Par défaut 10" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedMoviesResponse" } }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      },
+      "post": {
+        "summary": "Créer un film (admin)",
+        "tags": ["movies"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MovieCreate" } } }
+        },
+        "responses": {
+          "201": { "description": "Créé", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Movie" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/Unprocessable" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/movies/{id}": {
+      "parameters": [ { "$ref": "#/components/parameters/IdParam" } ],
+      "get": {
+        "summary": "Obtenir un film",
+        "tags": ["movies"],
+        "security": [],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Movie" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      },
+      "patch": {
+        "summary": "Mettre à jour un film (admin)",
+        "tags": ["movies"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MovieUpdate" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Movie" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/Unprocessable" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un film (admin)",
+        "tags": ["movies"],
+        "responses": {
+          "204": { "description": "Supprimé" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+
+    "/series": {
+      "get": {
+        "summary": "Lister les séries",
+        "tags": ["series"],
+        "security": [],
+        "parameters": [
+          { "name": "title", "in": "query", "schema": { "type": "string", "minLength": 1, "maxLength": 200 } },
+          { "name": "genre", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["ongoing", "ended"] } }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Series" } } } } },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      },
+      "post": {
+        "summary": "Créer une série (admin)",
+        "tags": ["series"],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SeriesCreate" } } } },
+        "responses": {
+          "201": { "description": "Créé", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Series" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/Unprocessable" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/series/{seriesId}/seasons": {
+      "parameters": [ { "$ref": "#/components/parameters/SeriesIdParam" } ],
+      "post": {
+        "summary": "Créer une saison (admin)",
+        "tags": ["series"],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SeasonCreate" } } } },
+        "responses": {
+          "201": { "description": "Créé", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Season" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/Unprocessable" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/series/{seriesId}/seasons/{seasonId}/episodes": {
+      "parameters": [ { "$ref": "#/components/parameters/SeriesIdParam" }, { "$ref": "#/components/parameters/SeasonIdParam" } ],
+      "post": {
+        "summary": "Créer un épisode (admin)",
+        "tags": ["series"],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EpisodeCreate" } } } },
+        "responses": {
+          "201": { "description": "Créé", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Episode" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/Unprocessable" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      },
+      "get": {
+        "summary": "Lister les épisodes d'une saison",
+        "tags": ["series"],
+        "security": [],
+        "parameters": [ { "name": "minDuration", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 300 } } ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Episode" } } } } },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+
+    "/ratings": {
+      "post": {
+        "summary": "Créer une note (JWT)",
+        "tags": ["ratings"],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RatingCreate" } } } },
+        "responses": {
+          "201": { "description": "Créé", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Rating" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "422": { "$ref": "#/components/responses/Unprocessable" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/ratings/avg/movie/{movieId}": {
+      "parameters": [ { "$ref": "#/components/parameters/MovieIdParam" } ],
+      "get": {
+        "summary": "Moyenne des notes d'un film",
+        "tags": ["ratings"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RatingAverage" },
+                "examples": {
+                  "default": { "value": { "movieId": "64f0c2d8a1b2c3d4e5f60789", "average": 7.8, "count": 12 } }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/ratings/avg/series/{seriesId}": {
+      "parameters": [ { "$ref": "#/components/parameters/SeriesIdParam" } ],
+      "get": {
+        "summary": "Moyenne des notes d'une série (agrégée sur les épisodes)",
+        "tags": ["ratings"],
+        "security": [],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RatingAverage" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+
+    "/users/{id}/medias": {
+      "parameters": [ { "$ref": "#/components/parameters/UserIdParam" } ],
+      "get": {
+        "summary": "Lister les médias d'un utilisateur",
+        "tags": ["users"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
       }
     }
   },
-  "security": [{ "bearerAuth": [] }]
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "schemas": {
+      "ObjectId": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" },
+
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "code": { "type": "integer" },
+          "details": { "type": "string" }
+        }
+      },
+
+      "TokenResponse": {
+        "type": "object",
+        "properties": { "token": { "type": "string" } },
+        "required": ["token"],
+        "example": { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
+      },
+      "AuthRegisterRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email", "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$" },
+          "username": { "type": "string", "minLength": 1 },
+          "password": { "type": "string", "minLength": 1 },
+          "role": { "type": "string", "enum": ["user", "admin"] }
+        },
+        "required": ["email", "username", "password"]
+      },
+      "AuthRegisterResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "$ref": "#/components/schemas/ObjectId" },
+          "email": { "type": "string" },
+          "username": { "type": "string" },
+          "role": { "type": "string", "enum": ["user", "admin"] },
+          "token": { "type": "string" }
+        },
+        "required": ["id", "email", "username", "role", "token"]
+      },
+      "AuthLoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" }
+        },
+        "required": ["email", "password"]
+      },
+
+      "Movie": {
+        "type": "object",
+        "properties": {
+          "_id": { "$ref": "#/components/schemas/ObjectId" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "genres": { "type": "array", "items": { "type": "string" }, "maxItems": 30 },
+          "synopsis": { "type": "string" },
+          "releaseDate": { "type": "string", "format": "date-time" },
+          "durationMin": { "type": "integer", "minimum": 1, "maximum": 600 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["title"]
+      },
+      "MovieCreate": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "genres": { "type": "array", "items": { "type": "string" }, "maxItems": 30 },
+          "synopsis": { "type": "string" },
+          "releaseDate": { "type": "string", "format": "date-time" },
+          "durationMin": { "type": "integer", "minimum": 1, "maximum": 600 }
+        },
+        "required": ["title"]
+      },
+      "MovieUpdate": { "$ref": "#/components/schemas/MovieCreate" },
+      "PaginatedMoviesResponse": {
+        "type": "object",
+        "properties": {
+          "page": { "type": "integer", "minimum": 1 },
+          "limit": { "type": "integer", "minimum": 1 },
+          "total": { "type": "integer", "minimum": 0 },
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/Movie" } }
+        }
+      },
+
+      "Series": {
+        "type": "object",
+        "properties": {
+          "_id": { "$ref": "#/components/schemas/ObjectId" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "genres": { "type": "array", "items": { "type": "string" }, "maxItems": 30 },
+          "status": { "type": "string", "enum": ["ongoing", "ended"] },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["title", "status"]
+      },
+      "SeriesCreate": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "genres": { "type": "array", "items": { "type": "string" }, "maxItems": 30 },
+          "status": { "type": "string", "enum": ["ongoing", "ended"] }
+        },
+        "required": ["title", "status"]
+      },
+      "Season": {
+        "type": "object",
+        "properties": {
+          "_id": { "$ref": "#/components/schemas/ObjectId" },
+          "seriesId": { "$ref": "#/components/schemas/ObjectId" },
+          "seasonNo": { "type": "integer", "minimum": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["seriesId", "seasonNo"]
+      },
+      "SeasonCreate": {
+        "type": "object",
+        "properties": { "seasonNo": { "type": "integer", "minimum": 1 } },
+        "required": ["seasonNo"]
+      },
+      "SeasonIdParam": { "$ref": "#/components/parameters/SeasonIdParam" },
+
+      "Episode": {
+        "type": "object",
+        "properties": {
+          "_id": { "$ref": "#/components/schemas/ObjectId" },
+          "seriesId": { "$ref": "#/components/schemas/ObjectId" },
+          "seasonId": { "$ref": "#/components/schemas/ObjectId" },
+          "epNo": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "durationMin": { "type": "integer", "minimum": 1, "maximum": 300 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["seriesId", "seasonId", "epNo", "title", "durationMin"]
+      },
+      "EpisodeCreate": {
+        "type": "object",
+        "properties": {
+          "epNo": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "durationMin": { "type": "integer", "minimum": 1, "maximum": 300 }
+        },
+        "required": ["epNo", "title", "durationMin"]
+      },
+
+      "Rating": {
+        "type": "object",
+        "properties": {
+          "_id": { "$ref": "#/components/schemas/ObjectId" },
+          "userId": { "$ref": "#/components/schemas/ObjectId" },
+          "target": { "type": "string", "enum": ["movie", "episode"] },
+          "targetId": { "$ref": "#/components/schemas/ObjectId" },
+          "score": { "type": "number", "minimum": 0, "maximum": 10 },
+          "review": { "type": "string", "maxLength": 2000 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["userId", "target", "targetId", "score"]
+      },
+      "RatingCreate": {
+        "type": "object",
+        "properties": {
+          "target": { "type": "string", "enum": ["movie", "episode"] },
+          "targetId": { "$ref": "#/components/schemas/ObjectId" },
+          "score": { "type": "number", "minimum": 0, "maximum": 10 },
+          "review": { "type": "string", "maxLength": 2000 }
+        },
+        "required": ["target", "targetId", "score"]
+      },
+
+      "RatingAverage": {
+        "type": "object",
+        "properties": {
+          "movieId": { "$ref": "#/components/schemas/ObjectId" },
+          "seriesId": { "$ref": "#/components/schemas/ObjectId" },
+          "average": { "type": "number", "nullable": true },
+          "count": { "type": "integer" }
+        }
+      }
+    },
+    "parameters": {
+      "IdParam": { "name": "id", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/ObjectId" } },
+      "MovieIdParam": { "name": "movieId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/ObjectId" } },
+      "SeriesIdParam": { "name": "seriesId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/ObjectId" } },
+      "SeasonIdParam": { "name": "seasonId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/ObjectId" } },
+      "UserIdParam": { "name": "id", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/ObjectId" } }
+    },
+    "responses": {
+      "BadRequest": { "description": "Requête invalide", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" }, "examples": { "default": { "value": { "message": "Données manquantes", "code": 400 } } } } } },
+      "Unauthorized": { "description": "Non authentifié", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" }, "examples": { "default": { "value": { "message": "Authorization header manquant", "code": 401 } } } } } },
+      "Forbidden": { "description": "Interdit (admin requis)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" }, "examples": { "default": { "value": { "message": "Accès réservé aux admins", "code": 403 } } } } } },
+      "NotFound": { "description": "Ressource non trouvée", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" }, "examples": { "default": { "value": { "message": "Non trouvé", "code": 404 } } } } } },
+      "Unprocessable": { "description": "Erreur de validation", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" }, "examples": { "default": { "value": { "message": "Validation", "code": 422 } } } } } },
+      "ServerError": { "description": "Erreur serveur", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" }, "examples": { "default": { "value": { "message": "Erreur", "code": 500 } } } } } }
+    }
+  },
+  "security": [ { "bearerAuth": [] } ]
 }
