@@ -96,10 +96,36 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.get("/docs/v1", (req, res) => {
   res.sendFile(path.resolve(path.join(__dirname, "..", "..", "docs", "swagger-v1.json")));
 });
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'TV Tracker API v2 - Documentation'
-}));
+// DÉCLARATION D'ABORD 
+const swaggerV2Path = path.resolve(path.join(__dirname,"..", "..","docs", "swagger-v2.json"));
+
+const swaggerV2Doc = require(swaggerV2Path);
+
+console.log("===> Swagger V2 path:", swaggerV2Path);
+try {
+  console.log("===> Swagger V2 loaded:", Object.keys(swaggerV2Doc));
+} catch (e) {
+  console.error("Erreur chargement Swagger:", e);
+}
+
+
+app.use(
+  '/docs/v2',
+  swaggerUi.serveFiles(swaggerV2Doc, {}),
+  swaggerUi.setup(swaggerV2Doc, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'TV Tracker API v2 - Documentation'
+  })
+);
+
+app.use(
+  '/docs',
+  swaggerUi.serveFiles(swaggerSpec, {}),
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'TV Tracker API v2 - Documentation'
+  })
+);
 
 // Dev utility to validate DB write (local Mongo)
 app.post("/api/v2/dev/ping", async (req, res) => {
@@ -114,7 +140,7 @@ app.post("/api/v2/dev/ping", async (req, res) => {
 // Middleware d'erreur
 app.use(errorHandler);
 
-// Démarrage du serveur (connect DB first)
+// Démarrage du serveur 
 const PORT = (config.has("server.http.port") ? config.get<number>("server.http.port") : process.env.PORT) || 3000;
 async function start() {
   try {

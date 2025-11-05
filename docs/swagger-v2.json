@@ -6,7 +6,7 @@
     "description": "API v2 avec JWT, rôles (user/admin) et MongoDB. "
   },
   "servers": [
-    { "url": "/docs/v2" }
+    { "url": "/api/v2" }
   ],
   "paths": {
     "/auth/register": {
