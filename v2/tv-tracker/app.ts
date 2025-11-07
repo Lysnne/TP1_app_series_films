@@ -22,38 +22,7 @@ import { logOperation } from "./src/utils/logger";
 
 const app = express();
 app.use(express.json());
-const swaggerOptions = {
-  definition: {
-      openapi: '3.0.0',
-      info: {
-          title: 'TV Tracker API v2',
-          version: '2.0.0',
-          description: 'API RESTful professionnelle pour la gestion de films et séries avec MongoDB, JWT et Swagger'
-      },
-      servers: [
-          {
-              url: 'https://localhost:3001',
-              description: 'Serveur de prod'
-          },
-          {
-              url: 'http://localhost:3000',
-              description: 'Serveur de développement'
-          }
 
-      ],
-      components: {
-          securitySchemes: {
-              bearerAuth: {
-                  type: 'http',
-                  scheme: 'bearer',
-                  bearerFormat: 'JWT'
-              }
-          }
-      }
-  },
-  // glob qui fonctionne en dev (ts) et après compilation (dist/*.js)
-  apis: ['./**/*.ts', './dist/**/*.js']
-};
 
 const allowedOrigins: string[] = config.get("security.cors.origins");
 app.use(
@@ -91,11 +60,20 @@ app.use("/api/v2/logs", logsRouter);
 app.use("/api/v2/auth", authRouter);
 app.use("/api/v2/ratings", ratingsV2Router);
 
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-app.get("/docs/v1", (req, res) => {
-  res.sendFile(path.resolve(path.join(__dirname, "..", "..", "docs", "swagger-v1.json")));
-});
+
+// Configuration pour Swagger UI v1
+const swaggerV1Path = path.resolve(path.join(__dirname, "..", "..", "docs", "swagger-v1.json"));
+const swaggerV1Doc = require(swaggerV1Path);
+
+app.use(
+  '/docs/v1',
+  swaggerUi.serveFiles(swaggerV1Doc, {}),
+  swaggerUi.setup(swaggerV1Doc, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'TV Tracker API v1 - Documentation (Deprecated)'
+  })
+);
 // DÉCLARATION D'ABORD 
 const swaggerV2Path = path.resolve(path.join(__dirname,"..", "..","docs", "swagger-v2.json"));
 
@@ -118,14 +96,7 @@ app.use(
   })
 );
 
-app.use(
-  '/docs',
-  swaggerUi.serveFiles(swaggerSpec, {}),
-  swaggerUi.setup(swaggerSpec, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'TV Tracker API v2 - Documentation'
-  })
-);
+
 
 // Dev utility to validate DB write (local Mongo)
 app.post("/api/v2/dev/ping", async (req, res) => {
